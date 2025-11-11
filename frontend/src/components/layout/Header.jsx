@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../../../hooks/useAuth.jsx";
+import { useAuth } from "../../hooks/useAuth.jsx";
 import axios from "axios";
 
 const Header = () => {

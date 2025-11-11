@@ -31,12 +31,14 @@ const Analytics = () => {
         return;
       }
 
+      // FIXED: Proper template literal syntax
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
       const response = await fetch(
-        ${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/reports/export/deals,
+        `${apiUrl}/reports/export/deals`,
         {
           method: 'GET',
           headers: {
-            'Authorization': Bearer ${token},
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         }
@@ -51,7 +53,7 @@ const Analytics = () => {
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = deals-export-${new Date().toISOString().split('T')[0]}.csv;
+      a.download = `deals-export-${new Date().toISOString().split('T')[0]}.csv`;
       
       document.body.appendChild(a);
       a.click();
@@ -131,7 +133,7 @@ const Analytics = () => {
             <div>
               <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total Value</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">
-                {kpisLoading ? '...' : $${(kpis.total_value ?? 0).toLocaleString()}}
+                {kpisLoading ? '...' : `$${(kpis.total_value ?? 0).toLocaleString()}`}
               </p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
@@ -145,7 +147,7 @@ const Analytics = () => {
             <div>
               <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Conversion Rate</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">
-                {kpisLoading ? '...' : ${(kpis.conversion_rate ?? 0).toFixed(1)}%}
+                {kpisLoading ? '...' : `${(kpis.conversion_rate ?? 0).toFixed(1)}%`}
               </p>
             </div>
             <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">

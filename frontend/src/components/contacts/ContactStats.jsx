@@ -107,7 +107,7 @@ const ContactStats = ({ stats }) => {
                 <p className="text-sm font-medium text-gray-600">{statusInfo.label}</p>
                 <p className="text-2xl font-bold text-gray-900">{stat.count || 0}</p>
               </div>
-              <div className={⁠ w-3 h-3 rounded-full ${statusInfo.color} ⁠}></div>
+              <div className={`w-3 h-3 rounded-full ${statusInfo.color}`}></div>
             </div>
           </div>
         );

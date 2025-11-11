@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { useAuth } from '../../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
-
+import { useAuth } from '../../hooks/useAuth'
 function Login() {
   const [isLogin, setIsLogin] = useState(true)
   const [formData, setFormData] = useState({
@@ -203,4 +202,4 @@ function Login() {
   )
 }
 
-export default Login*
+export default Login;

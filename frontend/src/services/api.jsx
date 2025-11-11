@@ -9,6 +9,8 @@ const api = axios.create({
   },
 });
 
+
+
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
@@ -51,53 +53,46 @@ export const authAPI = {
     return response.data;
   },
   getProfile: async () => {
-    const response = await api.get('/auth/me'); // Changed from /auth/profile to /auth/me
+    const response = await api.get('/auth/profile');
     return response.data;
   },
 };
 
-// Contacts API - UPDATED to match backend response format
+// Contacts API
 export const contactsAPI = {
   getAll: async (params = {}) => {
     const { page = 1, limit = 10, search = '', status = '' } = params;
     const response = await api.get('/contacts', {
       params: { page, limit, search, status }
     });
-    // Your backend returns { contacts: [], pagination: {} }
     return response.data;
   },
   getById: async (id) => {
     const response = await api.get(`/contacts/${id}`);
-    // Your backend returns the contact object directly
     return response.data;
   },
   create: async (data) => {
     const response = await api.post('/contacts', data);
-    // Your backend returns { message: '', contactId: '', contact: {} }
     return response.data;
   },
   update: async (id, data) => {
     const response = await api.put(`/contacts/${id}`, data);
-    // Your backend returns { message: '', affectedRows: '' }
     return response.data;
   },
   delete: async (id) => {
     const response = await api.delete(`/contacts/${id}`);
-    // Your backend returns { message: '' }
     return response.data;
   },
   getStats: async () => {
     const response = await api.get('/contacts/stats/overview');
-    // Your backend returns array of { status: '', count: '' }
     return response.data;
   },
 };
 
-// Deals API - UPDATED to match backend response format
+// Deals API
 export const dealsAPI = {
   getAll: async () => {
     const response = await api.get('/deals');
-    // Your backend returns array of deals directly
     return response.data;
   },
   getById: async (id) => {
@@ -117,8 +112,6 @@ export const dealsAPI = {
     return response.data;
   },
 };
-
-// Tasks API - UPDATED to match backend response format
 export const tasksAPI = {
   getAll: async ({ page = 1, limit = 10, status = '', priority = '' } = {}) => {
     const params = { page, limit };
@@ -126,52 +119,79 @@ export const tasksAPI = {
     if (priority) params.priority = priority;
 
     const response = await api.get('/tasks', { params });
-    // Your backend returns { tasks: [], pagination: {} }
-    return response.data;
+    return response.data; // returns { tasks: [...], pagination: {...} }
   },
+
   getById: async (id) => {
     const response = await api.get(`/tasks/${id}`);
     return response.data;
   },
+
   create: async (data) => {
-    const response = await api.post('/tasks', data);
+    // Ensure numbers are sent as numbers
+    const payload = {
+      ...data,
+      assigned_to: data.assigned_to ? parseInt(data.assigned_to) : null,
+      related_id: data.related_id ? parseInt(data.related_id) : null
+    };
+
+    const response = await api.post('/tasks', payload);
     return response.data;
   },
+
   update: async (id, data) => {
-    const response = await api.put(`/tasks/${id}`, data);
+    const payload = {
+      ...data,
+      assigned_to: data.assigned_to ? parseInt(data.assigned_to) : null,
+      related_id: data.related_id ? parseInt(data.related_id) : null
+    };
+
+    const response = await api.put(`/tasks/${id}`, payload);
     return response.data;
   },
+
   delete: async (id) => {
     const response = await api.delete(`/tasks/${id}`);
     return response.data;
   }
 };
 
-// Reports API - UPDATED to match backend response format
 export const reportsAPI = {
   getKPIs: async (period = 'month') => {
     const response = await api.get('/reports/kpis', {
       params: { period }
     });
-    // Your backend returns array of kpi objects
     return response.data;
   },
   getForecast: async (months = 3) => {
     const response = await api.get('/reports/forecast', {
       params: { months }
     });
-    // Your backend returns array of forecast objects
     return response.data;
   },
   getInsights: async (filters = {}) => {
     const response = await api.get('/reports/insights', {
       params: filters
     });
-    // Your backend returns array of insight objects
     return response.data;
   },
   exportDeals: async () => {
     const response = await api.get('/reports/export/deals');
+    return response.data;
+  },
+  // Keep these for backward compatibility, but map to actual endpoints
+  getDashboard: async () => {
+    // Use kpis endpoint as dashboard data
+    const response = await api.get('/reports/kpis', {
+      params: { period: 'month' }
+    });
+    return response.data;
+  },
+  getSales: async () => {
+    // Use forecast endpoint as sales data
+    const response = await api.get('/reports/forecast', {
+      params: { months: 3 }
+    });
     return response.data;
   }
 };

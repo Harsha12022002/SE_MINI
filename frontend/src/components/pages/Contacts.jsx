@@ -3,6 +3,7 @@ import { contactsAPI } from "../../services/api";
 
 export default function Contacts() {
   const [contacts, setContacts] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
@@ -262,7 +263,7 @@ export default function Contacts() {
                             <span className="text-gray-700">{contact.company || "-"}</span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={⁠ inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(contact.status)} ⁠}>
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(contact.status)}`}>
                               {contact.status}
                             </span>
                           </td>

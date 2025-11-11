@@ -1,6 +1,3 @@
-
-
-
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { pool } = require('../config/db');
@@ -8,6 +5,7 @@ const { authenticateToken } = require('../middleware/auth');
 const { checkContactAccess } = require('../middleware/accessControl');
 
 const router = express.Router();
+
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const page = parseInt(req.query.page, 10) || 1;
@@ -32,7 +30,7 @@ router.get('/', authenticateToken, async (req, res) => {
 
     if (search) {
       whereConditions.push('(c.name LIKE ? OR c.email LIKE ? OR c.company LIKE ?)');
-      queryParams.push(%${search}%, %${search}%, %${search}%);
+      queryParams.push(`%${search}%`, `%${search}%`, `%${search}%`); // ✅ FIXED: Added backticks
     }
 
     if (status) {
@@ -135,7 +133,7 @@ router.post(
       await pool.execute(
         `INSERT INTO team_interactions (user_id, action_type, target_type, target_id, description)
          VALUES (?, 'create', 'contact', ?, ?)`,
-        [req.user.id, result.insertId, Created contact: ${name}]
+        [req.user.id, result.insertId, `Created contact: ${name}`] // ✅ FIXED: Added backticks
       );
 
       res.status(201).json({
@@ -194,8 +192,8 @@ router.delete('/:id', async (req, res) => {
 router.get('/stats/overview', authenticateToken, async (req, res) => {
   try {
     const query = req.user.role === 'admin'
-      ? SELECT status, COUNT(*) AS count FROM contacts GROUP BY status ORDER BY status
-      : SELECT status, COUNT(*) AS count FROM contacts WHERE assigned_to = ? GROUP BY status ORDER BY status;
+      ? `SELECT status, COUNT(*) AS count FROM contacts GROUP BY status ORDER BY status` // ✅ FIXED: Added backticks
+      : `SELECT status, COUNT(*) AS count FROM contacts WHERE assigned_to = ? GROUP BY status ORDER BY status`; // ✅ FIXED: Added backticks
 
     const params = req.user.role === 'admin' ? [] : [req.user.id];
     const [stats] = await pool.execute(query, params);
@@ -208,6 +206,3 @@ router.get('/stats/overview', authenticateToken, async (req, res) => {
 });
 
 module.exports = router;
-
-
-

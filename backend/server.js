@@ -6,7 +6,7 @@ const { testConnection } = require('./config/db');
 
 const authRoutes = require('./routes/auth');
 const dealRoutes = require('./routes/deals');
-const contactRoutes = require('./routes/contacts');
+const contactRoutes = require('./routes/Contacts');
 const taskRoutes = require('./routes/tasks');
 const reportRoutes = require('./routes/reports');
 const pipelineRoutes = require('./routes/pipeline');
@@ -49,6 +49,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Error handling middleware
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });

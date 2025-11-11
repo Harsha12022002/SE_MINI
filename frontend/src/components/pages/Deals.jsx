@@ -1,248 +1,4 @@
-//// components/Deals.jsx
-//import React, { useState, useEffect } from 'react';
-//import axios from 'axios';
-//
-//const Deals = () => {
-//  const [deals, setDeals] = useState([]);
-//  const [loading, setLoading] = useState(false);
-//  const [showForm, setShowForm] = useState(false);
-//  const [formData, setFormData] = useState({
-//    title: '',
-//    description: '',
-//    value: '',
-//    stage_id: 1,
-//    outcome: 'pending',
-//    close_date: '',
-//    contact_id: ''
-//  });
-//
-//  const API_URL = 'http://localhost:5000/api';
-//
-//  // Get token for auth
-//  const getAuthHeader = () => {
-//    const token = localStorage.getItem('authToken');
-//    return {
-//      headers: {
-//        Authorization: `Bearer ${token}`,
-//        'Content-Type': 'application/json'
-//      }
-//    };
-//  };
-//
-//  // Fetch all deals
-//  const fetchDeals = async () => {
-//    setLoading(true);
-//    try {
-//      const res = await axios.get(`${API_URL}/deals`, getAuthHeader());
-//      setDeals(res.data.deals || []);
-//    } catch (err) {
-//      console.error('Error fetching deals:', err);
-//      alert(err.response?.data?.message || 'Failed to fetch deals');
-//    }
-//    setLoading(false);
-//  };
-//
-//  useEffect(() => {
-//    fetchDeals();
-//  }, []);
-//
-//  // Handle input changes
-//  const handleInputChange = (e) => {
-//    const { name, value } = e.target;
-//    setFormData(prev => ({ ...prev, [name]: value }));
-//  };
-//
-//  // Create new deal
-//  const createDeal = async (e) => {
-//    e.preventDefault();
-//    setLoading(true);
-//
-//    // Prepare payload exactly for backend
-//    const payload = {
-//      title: formData.title,
-//      description: formData.description || '',
-//      value: formData.value ? parseFloat(formData.value) : null,
-//      stage_id: parseInt(formData.stage_id),
-//      outcome: formData.outcome || 'pending',
-//      close_date: formData.close_date || null,
-//      contact_id: formData.contact_id ? parseInt(formData.contact_id) : null
-//    };
-//
-//    try {
-//      const res = await axios.post(`${API_URL}/deals`, payload, getAuthHeader());
-//      alert('Deal created successfully!');
-//      setFormData({
-//        title: '',
-//        description: '',
-//        value: '',
-//        stage_id: 1,
-//        outcome: 'pending',
-//        close_date: '',
-//        contact_id: ''
-//      });
-//      setShowForm(false);
-//      fetchDeals();
-//    } catch (err) {
-//      console.error('Error creating deal:', err);
-//      alert(err.response?.data?.message || 'Failed to create deal');
-//    }
-//
-//    setLoading(false);
-//  };
-//
-//  return (
-//    <div style={styles.container}>
-//      <div style={styles.header}>
-//        <h1>Deals</h1>
-//        <button
-//          onClick={() => setShowForm(!showForm)}
-//          style={styles.addButton}
-//        >
-//          {showForm ? 'Cancel' : '+ Add Deal'}
-//        </button>
-//      </div>
-//
-//      {showForm && (
-//        <form onSubmit={createDeal} style={styles.form}>
-//          <h3>Add New Deal</h3>
-//
-//          <div style={styles.formGroup}>
-//            <label>Title *</label>
-//            <input
-//              type="text"
-//              name="title"
-//              value={formData.title}
-//              onChange={handleInputChange}
-//              required
-//              style={styles.input}
-//              placeholder="Deal title"
-//            />
-//          </div>
-//
-//          <div style={styles.formGroup}>
-//            <label>Description</label>
-//            <textarea
-//              name="description"
-//              value={formData.description}
-//              onChange={handleInputChange}
-//              style={styles.textarea}
-//              placeholder="Deal description"
-//              rows="3"
-//            />
-//          </div>
-//
-//          <div style={styles.formGroup}>
-//            <label>Value ($)</label>
-//            <input
-//              type="number"
-//              name="value"
-//              value={formData.value}
-//              onChange={handleInputChange}
-//              style={styles.input}
-//              placeholder="0.00"
-//              step="0.01"
-//            />
-//          </div>
-//
-//          <div style={styles.formGroup}>
-//            <label>Stage ID *</label>
-//            <input
-//              type="number"
-//              name="stage_id"
-//              value={formData.stage_id}
-//              onChange={handleInputChange}
-//              required
-//              style={styles.input}
-//              min="1"
-//            />
-//          </div>
-//
-//          <div style={styles.formGroup}>
-//            <label>Status</label>
-//            <select
-//              name="outcome"
-//              value={formData.outcome}
-//              onChange={handleInputChange}
-//              style={styles.input}
-//            >
-//              <option value="pending">Pending</option>
-//              <option value="won">Won</option>
-//              <option value="lost">Lost</option>
-//            </select>
-//          </div>
-//
-//          <div style={styles.formGroup}>
-//            <label>Close Date</label>
-//            <input
-//              type="date"
-//              name="close_date"
-//              value={formData.close_date}
-//              onChange={handleInputChange}
-//              style={styles.input}
-//            />
-//          </div>
-//
-//          <div style={styles.formGroup}>
-//            <label>Contact ID</label>
-//            <input
-//              type="number"
-//              name="contact_id"
-//              value={formData.contact_id}
-//              onChange={handleInputChange}
-//              min="1"
-//              style={styles.input}
-//              placeholder="1"
-//            />
-//          </div>
-//
-//          <div style={styles.formActions}>
-//            <button type="submit" disabled={loading} style={styles.submitButton}>
-//              {loading ? 'Creating...' : 'Create Deal'}
-//            </button>
-//          </div>
-//        </form>
-//      )}
-//
-//      <div style={styles.dealsList}>
-//        <h2>Deals List ({deals.length})</h2>
-//        {loading && <p>Loading deals...</p>}
-//        {!loading && deals.length === 0 && <p>No deals found.</p>}
-//        {deals.map(deal => (
-//          <div key={deal.id} style={styles.dealCard}>
-//            <h3>{deal.title}</h3>
-//            <p>{deal.description}</p>
-//            <div style={styles.dealDetails}>
-//              <span>Value: ${deal.value ? Number(deal.value).toLocaleString() : '0'}</span>
-//              <span>Stage: {deal.stage_name || deal.stage_id}</span>
-//              <span>Status: {deal.outcome}</span>
-//            </div>
-//          </div>
-//        ))}
-//      </div>
-//    </div>
-//  );
-//};
-//
-//const styles = {
-//  container: { padding: '20px', maxWidth: '800px', margin: '0 auto', fontFamily: 'Arial, sans-serif' },
-//  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' },
-//  addButton: { backgroundColor: '#007bff', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px', cursor: 'pointer' },
-//  form: { backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', marginBottom: '20px' },
-//  formGroup: { marginBottom: '15px' },
-//  input: { width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', boxSizing: 'border-box' },
-//  textarea: { width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', boxSizing: 'border-box', resize: 'vertical' },
-//  formActions: { marginTop: '15px' },
-//  submitButton: { backgroundColor: '#28a745', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer' },
-//  dealsList: { marginTop: '20px' },
-//  dealCard: { backgroundColor: 'white', border: '1px solid #ddd', borderRadius: '8px', padding: '15px', marginBottom: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
-//  dealDetails: { display: 'flex', gap: '15px', fontSize: '14px', color: '#888' }
-//};
-//
-//export default Deals;
-
-
-// components/Deals.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const Deals = () => {
@@ -271,21 +27,24 @@ const Deals = () => {
     };
   };
 
-  const fetchDeals = async () => {
+  // ✅ useCallback prevents ESLint missing-dependency warning
+  const fetchDeals = useCallback(async () => {
     setLoading(true);
     try {
       const res = await axios.get(`${API_URL}/deals`, getAuthHeader());
+      console.log('Created deal:', res.data);
+
       setDeals(res.data.deals || []);
     } catch (err) {
       console.error('Error fetching deals:', err);
       alert(err.response?.data?.message || 'Failed to fetch deals');
     }
     setLoading(false);
-  };
+  }, [API_URL]);
 
   useEffect(() => {
     fetchDeals();
-  }, []);
+  }, [fetchDeals]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -300,14 +59,14 @@ const Deals = () => {
       title: formData.title,
       description: formData.description || '',
       value: formData.value ? parseFloat(formData.value) : null,
-      stage_id: parseInt(formData.stage_id),
+      stage_id: parseInt(formData.stage_id, 10),
       outcome: formData.outcome || 'pending',
       close_date: formData.close_date || null,
-      contact_id: formData.contact_id ? parseInt(formData.contact_id) : null
+      contact_id: formData.contact_id ? parseInt(formData.contact_id, 10) : null
     };
 
     try {
-      const res = await axios.post(`${API_URL}/deals`, payload, getAuthHeader());
+      await axios.post(`${API_URL}/deals`, payload, getAuthHeader());
       alert('Deal created successfully!');
       setFormData({
         title: '',

@@ -5,17 +5,16 @@ import { Toaster } from 'react-hot-toast';
 
 // Layout & Pages
 import Layout from './components/layout/Layout';
-import Dashboard from './pages/Dashboard';
-import Deals from './pages/Deals';
-import Contacts from './pages/Contacts';
-import Tasks from './pages/Task';
-import Analytics from './pages/Analytics';
-import Team from './pages/Team';
-import Login from './pages/Login';
+import Dashboard from './components/pages/Dashboard';
+import Deals from './components/pages/Deals';
+import Contacts from './components/pages/Contacts';
+import Tasks from './components/pages/Task';
+import Analytics from './components/pages/Analytics';
+import Team from './components/pages/Team';
+import Login from './components/pages/Login';
 
 // Hooks
-import { AuthProvider, useAuth } from '../hooks/useAuth.jsx';
-
+import { AuthProvider, useAuth } from "./hooks/useAuth";
 // Create a client
 const queryClient = new QueryClient();
 
