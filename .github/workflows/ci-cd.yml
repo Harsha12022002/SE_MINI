@@ -29,7 +29,7 @@ jobs:
         working-directory: backend
         run: |
           if [ -f package.json ]; then
-            npm ci --legacy-peer-deps
+            npm install --legacy-peer-deps
           else
             echo "No backend package.json found, skipping..."
           fi
@@ -65,7 +65,7 @@ jobs:
         working-directory: backend
         run: |
           if [ -f package.json ]; then
-            npm ci --legacy-peer-deps --no-audit --no-fund
+            npm install --legacy-peer-deps --no-audit --no-fund
             echo "🔍 Running npm audit (backend)..."
             npm audit --json | node -e "
               const fs=require('fs');
@@ -91,7 +91,7 @@ jobs:
         working-directory: frontend
         run: |
           if [ -f package.json ]; then
-            npm ci --legacy-peer-deps
+            npm install --legacy-peer-deps
           else
             echo "No frontend package.json found, skipping..."
           fi
@@ -136,7 +136,7 @@ jobs:
         working-directory: frontend
         run: |
           if [ -f package.json ]; then
-            npm ci --legacy-peer-deps --no-audit --no-fund
+            npm install --legacy-peer-deps --no-audit --no-fund
             echo "🔍 Running npm audit (frontend)..."
             npm audit --json | node -e "
               const fs=require('fs');
