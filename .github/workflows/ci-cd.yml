@@ -23,7 +23,7 @@ jobs:
             frontend/package-lock.json
             backend/package-lock.json
 
-      # 🧩 Backend setup
+      # Backend install, lint, test
       - name: Install backend dependencies
         working-directory: backend
         run: |
@@ -37,7 +37,7 @@ jobs:
         working-directory: backend
         run: |
           if [ -f package.json ] && npm list --depth=0 | grep -q eslint; then
-            npm run lint || echo "Lint script missing, skipping..."
+            npm run lint || echo "Lint script missing/failed, skipping..."
           else
             echo "No backend linting configured, skipping..."
           fi
@@ -51,7 +51,19 @@ jobs:
             echo "No backend tests configured, skipping..."
           fi
 
-      # 🧩 Frontend setup
+      # Backend security audit + score
+      - name: Security Audit Score (Backend)
+        working-directory: backend
+        run: |
+          if [ -f package.json ]; then
+            npm ci --legacy-peer-deps --no-audit --no-fund
+            echo "🔍 Running npm audit (backend)..."
+            npm audit --json | node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync(0,'utf8'));const v=d.metadata?.vulnerabilities||{info:0,low:0,moderate:0,high:0,critical:0};const total=Object.values(v).reduce((a,b)=>a+b,0);const score=100-Math.min(total*5,100);if(total===0){console.log('✅ Backend Score: 100/100 (No vulnerabilities)');process.exit(0);}else{console.error('⚠️ Backend vulnerabilities: '+JSON.stringify(v)+'\nScore: '+score+'/100');process.exit(1)}"
+          else
+            echo "No backend package.json found, skipping backend audit"
+          fi
+
+      # Frontend install, lint, test, build
       - name: Install frontend dependencies
         working-directory: frontend
         run: |
@@ -65,7 +77,7 @@ jobs:
         working-directory: frontend
         run: |
           if [ -f package.json ] && npm list --depth=0 | grep -q eslint; then
-            npm run lint || echo "Lint script missing, skipping..."
+            npm run lint || echo "Lint script missing/failed, skipping..."
           else
             echo "No frontend linting configured, skipping..."
           fi
@@ -88,29 +100,28 @@ jobs:
             echo "No frontend build script found, skipping..."
           fi
 
-      - name: Security audit (frontend)
+      # Frontend security audit + score
+      - name: Security Audit Score (Frontend)
         working-directory: frontend
         run: |
           if [ -f package.json ]; then
-            npm audit --audit-level=high || echo "Security audit skipped or failed"
+            npm ci --legacy-peer-deps --no-audit --no-fund
+            echo "🔍 Running npm audit (frontend)..."
+            npm audit --json | node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync(0,'utf8'));const v=d.metadata?.vulnerabilities||{info:0,low:0,moderate:0,high:0,critical:0};const total=Object.values(v).reduce((a,b)=>a+b,0);const score=100-Math.min(total*5,100);if(total===0){console.log('✅ Frontend Score: 100/100 (No vulnerabilities)');process.exit(0);}else{console.error('⚠️ Frontend vulnerabilities: '+JSON.stringify(v)+'\nScore: '+score+'/100');process.exit(1)}"
           else
-            echo "No package.json found, skipping security audit"
+            echo "No frontend package.json found, skipping frontend audit"
           fi
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Deploy to staging
         run: echo "🚀 Deploying to staging environment..."
-
       - name: Run integration tests
         run: echo "🧪 Running integration tests..."
-
       - name: Deploy to production
         run: echo "🚀 Deploying to production environment..."
