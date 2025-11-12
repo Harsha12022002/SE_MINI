@@ -3,10 +3,10 @@ module.exports = [
     files: ["**/*.js"],
     languageOptions: {
       ecmaVersion: "latest",
-      sourceType: "script",
+      sourceType: "module", // Changed from "script" to "module"
       globals: {
         require: "readonly",
-        module: "readonly",
+        module: "readonly", 
         process: "readonly",
         __dirname: "readonly",
         console: "readonly"
