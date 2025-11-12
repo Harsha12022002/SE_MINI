@@ -43,14 +43,22 @@ jobs:
             echo "No backend linting configured, skipping..."
           fi
 
-      - name: Run backend tests
+      # ✅ Run backend tests with coverage
+      - name: Run backend tests with coverage
         working-directory: backend
         run: |
           if [ -f package.json ] && npm list --depth=0 | grep -q jest; then
-            npm test || echo "Backend tests failed or missing"
+            npm test -- --coverage || echo "Backend tests failed or missing"
           else
             echo "No backend tests configured, skipping..."
           fi
+
+      # 📦 Upload backend coverage
+      - name: Upload backend coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage
 
       # 🧠 Backend Security Audit (Fail only on High/Critical)
       - name: Security Audit Score (Backend)
@@ -97,14 +105,22 @@ jobs:
             echo "No frontend linting configured, skipping..."
           fi
 
-      - name: Run frontend tests
+      # ✅ Run frontend tests with coverage
+      - name: Run frontend tests with coverage
         working-directory: frontend
         run: |
           if [ -f package.json ] && npm list --depth=0 | grep -q vitest; then
-            npm run test || echo "Frontend tests failed or missing"
+            npm run test -- --coverage || echo "Frontend tests failed or missing"
           else
             echo "No frontend tests configured, skipping..."
           fi
+
+      # 📦 Upload frontend coverage
+      - name: Upload frontend coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
 
       - name: Build frontend
         working-directory: frontend
