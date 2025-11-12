@@ -48,6 +48,7 @@ jobs:
         working-directory: backend
         run: |
           if [ -f package.json ] && npm list --depth=0 | grep -q jest; then
+            echo "🧪 Running Jest tests with coverage..."
             npm test -- --coverage || echo "Backend tests failed or missing"
           else
             echo "No backend tests configured, skipping..."
@@ -55,6 +56,7 @@ jobs:
 
       # 📦 Upload backend coverage
       - name: Upload backend coverage report
+        if: hashFiles('backend/coverage/**') != ''
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage
@@ -105,18 +107,30 @@ jobs:
             echo "No frontend linting configured, skipping..."
           fi
 
-      # ✅ Run frontend tests with coverage
+      # ✅ Run frontend tests with coverage (auto-install fallback)
       - name: Run frontend tests with coverage
         working-directory: frontend
         run: |
-          if [ -f package.json ] && npm list --depth=0 | grep -q vitest; then
-            npm run test -- --coverage || echo "Frontend tests failed or missing"
+          if [ -f package.json ]; then
+            # Ensure coverage dependency exists
+            if ! npm list @vitest/coverage-v8 >/dev/null 2>&1; then
+              echo "🧩 Installing missing @vitest/coverage-v8..."
+              npm install --save-dev @vitest/coverage-v8 --legacy-peer-deps
+            fi
+
+            if npm list --depth=0 | grep -q vitest; then
+              echo "🧪 Running Vitest with coverage..."
+              npm run test -- --coverage || echo "Frontend tests failed or missing"
+            else
+              echo "No frontend tests configured, skipping..."
+            fi
           else
-            echo "No frontend tests configured, skipping..."
+            echo "No package.json found, skipping frontend tests..."
           fi
 
       # 📦 Upload frontend coverage
       - name: Upload frontend coverage report
+        if: hashFiles('frontend/coverage/**') != ''
         uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage
