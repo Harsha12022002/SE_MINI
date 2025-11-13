@@ -1,13 +1,16 @@
 // tests/accessControl.test.js
 process.env.NODE_ENV = "test";
 
-const { pool } = require("../config/db");
+// ---- MOCK DB FIRST (before loading middleware) ----
 jest.mock("../config/db", () => ({
   pool: {
     execute: jest.fn(),
   },
 }));
 
+const { pool } = require("../config/db");
+
+// ---- NOW load middleware, DB is already mocked ----
 const {
   checkDealAccess,
   checkContactAccess,
@@ -17,9 +20,10 @@ describe("ACCESS CONTROL", () => {
   let req, res, next;
 
   beforeEach(() => {
-    req = { params: {}, body: {}, user: { id: 1, role: "user" } };
+    req = { params: {}, user: { id: 1, role: "user" } };
     res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
     next = jest.fn();
+    pool.execute.mockReset();
   });
 
   // ---------------- DEAL ACCESS ----------------
@@ -74,4 +78,3 @@ describe("ACCESS CONTROL", () => {
     expect(res.status).toHaveBeenCalledWith(403);
   });
 });
-
